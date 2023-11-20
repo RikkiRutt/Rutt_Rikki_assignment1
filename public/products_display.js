@@ -4,7 +4,7 @@ for (let i = 0; i < products.length; i++) {
     document.querySelector('.row').innerHTML += `
         <div class="col-md-6 product_card" style="margin-bottom: 40px; padding: 15px;">
             <div>
-                <h5 style="float: center;" class="product_name">${products[i].name}</h5>
+                <h5 style="float: center;" class="product_name">${products[i].model}</h5>
                 <h5 style="float: center;">$${(products[i].price).toFixed(2)}</h5>
             </div>  
             <img src="${products[i].image}" style="width: 60%" class="img-thumbnail" alt="${products[i].alt}">

@@ -82,7 +82,7 @@ app.post("/process_purchase", function(request, response) {
 		responce.redirect("./products.html?error");
 	}
 	//if has input an no errors
-else if (has_qty == ture && Object.keys(errorObject).length == 0) {
+else if (has_qty == true && Object.keys(errorObject).length == 0) {
 	//update product qyantites and redir to the invoice page with valid data
 	for (let i in products) {
 		let qty = POST[`qty${[i]}`];
@@ -108,7 +108,7 @@ function validateQuantity(quantity, availableQuantity) {
 
 	quantity = Number(quantity); //convert quantity to number
 
-	switch (ture) {
+	switch (true) {
 		case isNaN(quantity)  || quantity === '':
 			errors.push("Not a number. Please enter a non-negative quantity to order.");
 			break;
