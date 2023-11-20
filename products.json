@@ -2,13 +2,13 @@
 	{
 		"model": "Oil Filter",
 		"price": 7.99,
-		"image": "Oil filter.jpg",
+		"image": "./images/Oil filter.jpg",
 		"qty_available": 20
 	},
 	{
 		"model": "Front Brake Pads",
 		"price": 109.99,
-		"image": "Brake Pads.jpg",
+		"image": "./images/Brake Pads.jpg",
 		"qty_available": 10
 	},
     {

@@ -29,16 +29,17 @@ app.listen(8080, () => console.log(`listening on port 8080`));
 const products = require(__dirname + "/products.json");
 
 // Define a route for handling a GET request to a path that matches "./products.js"
-app.get('./products.js', function(request, response, next) {
+app.get('/products.js', function(request, response, next) {
 	// Send the response as JS
 	response.type('.js');
 	
 	// Create a JS string (products_str) that contains data loaded from the products.json file
 	// Convert the JS string into a JSON string and embed it within variable products
-	const products_str = `let products = ${JSON.stringify(products)};`;
+	let products_str = `let products = ${JSON.stringify(products)};`;
 	
 	// Send the string in response to the GET request
 	response.send(products_str);
+	console.log(products_str);
 });
 
 // add express middleware urlencoded so the post data can be decoded from browser body
@@ -133,4 +134,4 @@ app.use(express.static(__dirname + '/public'));
 
 
 // Start the server; listen on port 8080 for incoming HTTP requests
-app.listen(8080, () => console.log(`listening on port 8080`)); 
+//app.listen(8080, () => console.log(`listening on port 8080`)); 
