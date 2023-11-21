@@ -28,7 +28,7 @@ for (let i = 0; i < products.length; i++) {
                                 <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 35px; margin-bottom: 5px;" onclick="document.getElementById('qty${[i]}_entered').value--; checkInputTextbox(document.getElementById('qty${[i]}_entered'), ${products[i].qty_available});">-</button>
 
                                 <!-- Input field for quantity with onkeyup event -->
-                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="width: 50px; text-align: center; margin: 0 10px; border: none;" onkeyup="checkInputTextbox(this,${products[i].qty_available})">
+                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 50px; text-align: center; margin: 0 10px; border: none;" onkeyup="checkInputTextbox(this,${products[i].qty_available})">
 
                                 <!-- Increase quantity button with an onclick event -->
                                 <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="document.getElementById('qty${[i]}_entered').value++; checkInputTextbox(document.getElementById('qty${[i]}_entered'), ${products[i].qty_available});">+</button>
@@ -37,7 +37,7 @@ for (let i = 0; i < products.length; i++) {
                     </tr>
                     <tr>
                         <!-- Error message for quantity validation -->
-                        <td colspan="3" style="padding-top: 5px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
+                        <td colspan="3" style="padding-top: 30px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
                     </tr>
                 </table>
             </div>  
