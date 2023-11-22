@@ -7,6 +7,9 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>Rik's Car Parts Store-Invoice</title>
+
+        <!-- load product information-->
+        <script src="./products.js"></script>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Bootstrap icons-->
@@ -44,7 +47,27 @@
                 </div>
             </div>
         </header>
-       
+       <div class="container">
+        <br>
+        <br>
+
+        <!-- table for invoice-->
+        <table class="table">
+                <tr>
+                    <th colspan="2">Item</th>
+                    <th>Quantity Purchased</th>
+                    <th>Remaining Inventory</th>
+                    <th>Price</th>
+                    <th>Extended Price</th>
+                </tr>
+            </thead>
+            <tbody id="invoice_table"></tbody>
+            <tbody id="total_display"></tbody>
+        </table>
+       </div>
+
+       <!--js file for invocie-->
+       <script src="./invoice.js"></script>
         <!-- Footer-->
         <footer class="py-5 bg-dark">
             <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Rikki Rutt 2023</p></div>
