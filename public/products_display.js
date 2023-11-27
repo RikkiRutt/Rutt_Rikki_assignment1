@@ -2,12 +2,12 @@
 for (let i = 0; i < products.length; i++) {
     // Create a product card for each product
     document.querySelector('.row').innerHTML += `
-        <div class="col-md-6 product_card" style="margin-bottom: 40px; padding: 15px;">
+        <div class="col-md-4 product_card" style="margin-bottom: 40px; padding: 15px;">
             <div>
-                <h5 class="product_name">${products[i].model}</h5>
+                <h5 class="product_name"><b>${products[i].model}</b></h5>
                 <h5>$${(products[i].price).toFixed(2)}</h5>
             </div>  
-            <img src="${products[i].image}" style="width: 400px; height: 350px;" class="img-thumbnail" alt="${products[i].alt}">
+            <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
             <div style="height: 90px;">
                 <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
                     <tr>
@@ -23,12 +23,12 @@ for (let i = 0; i < products.length; i++) {
 
                         <!-- Input field for quantity and buttons to increase/decrease -->
                         <td style="text-align: left; width: 35%;" rowspan="2">
-                            <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 45%; height: 40px; padding: 10px;">
+                            <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
                                 <!-- Decrease quantity button with an onclick event -->
                                 <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 35px; margin-bottom: 5px;" onclick="document.getElementById('qty${[i]}_entered').value--; checkInputTextbox(document.getElementById('qty${[i]}_entered'), ${products[i].qty_available});">-</button>
 
                                 <!-- Input field for quantity with onkeyup event -->
-                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 50px; text-align: center; margin: 0 10px; border: none;" onkeyup="checkInputTextbox(this,${products[i].qty_available})">
+                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" onkeyup="checkInputTextbox(this,${products[i].qty_available})">
 
                                 <!-- Increase quantity button with an onclick event -->
                                 <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="document.getElementById('qty${[i]}_entered').value++; checkInputTextbox(document.getElementById('qty${[i]}_entered'), ${products[i].qty_available});">+</button>
