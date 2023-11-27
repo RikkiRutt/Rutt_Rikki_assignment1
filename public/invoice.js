@@ -33,7 +33,7 @@ for (let i in qty) {
     document.querySelector('#invoice_table').innerHTML += `
         <tr style="border: none;">
             <td width="10%"><img src="${products[i].image}" alt="${products[i].alt}" style="border-radius: 5px;"></td>
-            <td>${products[i].name}</td>
+            <td>${products[i].model}</td>
             <td>${qty[i]}</td>
             <td>${products[i].qty_available}</td>
             <td>$${products[i].price.toFixed(2)}</td>
