@@ -10833,9 +10833,9 @@ textarea.form-control-lg {
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
+  display: block;
   font-size: 20px;
-  margin: 4px 2px;
+  margin: 4px auto;
   cursor: pointer;
   border-radius: 50px;
   width: 1100px;
