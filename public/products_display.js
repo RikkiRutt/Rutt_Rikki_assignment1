@@ -1,3 +1,4 @@
+//code used from sal and bing chat gpt
 // Populate the DOM Form with the product details
 for (let i = 0; i < products.length; i++) {
     // Create a product card for each product
