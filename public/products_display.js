@@ -2,7 +2,7 @@
 for (let i = 0; i < products.length; i++) {
     // Create a product card for each product
     document.querySelector('.row').innerHTML += `
-        <div class="col-md-4 product_card" style="margin-bottom: 40px; padding: 15px;">
+        <div class="col-md-4 product_card" style="margin-bottom: 40px; padding: 20px;">
             <div>
                 <h5 class="product_name"><b>${products[i].model}</b></h5>
                 <h5>$${(products[i].price).toFixed(2)}</h5>
@@ -37,7 +37,7 @@ for (let i = 0; i < products.length; i++) {
                     </tr>
                     <tr>
                         <!-- Error message for quantity validation -->
-                        <td colspan="3" style="padding-top: 30px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
+                        <td colspan="3" style="padding-top: 50px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
                     </tr>
                 </table>
             </div>  
