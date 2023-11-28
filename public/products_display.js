@@ -38,7 +38,7 @@ for (let i = 0; i < products.length; i++) {
                     </tr>
                     <tr>
                         <!-- Error message for quantity validation -->
-                        <td colspan="3" style="padding-top: 50px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
+                        <td colspan="3" style="padding-top: 55px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
                     </tr>
                 </table>
             </div>  
@@ -82,6 +82,10 @@ function validateQuantity(quantity, availableQuantity) {
             break;
         // No default case needed as no errors means the array remains empty
     }
+        // If there are no errors, add a success message to the array
+    if (errors.length === 0) {
+        errors.push(`You would like ${quantity}`);
+    }
 
     return errors; // Return the array of errors
 };
@@ -107,9 +111,16 @@ function checkInputTextbox(textBox, availableQuantity) {
     // Check if there are any error messages and update the display
     let errorDisplay = document.getElementById(textBox.name + '_error');
     if (errorMessages.length > 0) {
-        errorDisplay.innerHTML = errorMessages.join('<br>');
-        errorDisplay.style.color = "red";
-        textBox.parentElement.style.borderColor = "red";
+        if (errorMessages[0].startsWith("You would like")) {
+            // If it's a success message, change the color to blue
+            errorDisplay.style.color = 'blue';
+            textBox.parentElement.style.borderColor = 'blue';
+        } else {
+            // If it's an error message, change the color to red
+            errorDisplay.style.color = 'red';
+            textBox.parentElement.style.borderColor = 'red';
+        }
+        errorDisplay.innerHTML = errorMessages[0];
     } else {
         errorDisplay.innerHTML = "";
         textBox.parentElement.style.borderColor = "black";
