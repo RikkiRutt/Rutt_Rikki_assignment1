@@ -68,10 +68,10 @@ function validateQuantity(quantity, availableQuantity) {
             errors.push("Not a number. Please enter a non-negative quantity to order.");
             break;
         case quantity < 0 && !Number.isInteger(quantity):
-            errors.push("Negative inventory and not an Integer. Please enter a non-negative quantity to order.");
+            errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
             break;
         case quantity < 0:
-            errors.push("Negative inventory. Please enter a non-negative quantity to order.");
+            errors.push("Negative quantity. Please enter a non-negative quantity to order.");
             break;
         case quantity !=0 && !Number.isInteger(quantity):
             errors.push("Not an Integer. Please enter a non-negative quantity to order.");
