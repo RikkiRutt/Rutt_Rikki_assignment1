@@ -10843,3 +10843,45 @@ textarea.form-control-lg {
 .sm-button:hover {
   background-color: #EB0A1E; /* Darker shade of Toyota Red */
 }
+
+
+.icon {
+  position: relative;
+  display: inline-block;
+}
+
+.icon:hover .popup {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 30px 0;
+  border-radius: 6px;
+  
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; 
+  left: 50%;
+  margin-left: -60px;
+  
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.popup::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -40px;
+  border-width: 40px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
