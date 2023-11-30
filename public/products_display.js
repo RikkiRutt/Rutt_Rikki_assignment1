@@ -78,7 +78,23 @@ for (let i = 0; i < products.length; i++) {
 }
 
 
-
+// Add event listener for purchase sub with errors present
+let qty_form = document.getElementById('qty_form'); 
+qty_form.addEventListener('submit', function(event) {
+    let hasErrors = false;
+    for (let i in products) {
+        let qtyInput = qty_form[`qty${[i]}_entered`];
+        let errorMessages = validateQuantity(qtyInput.value, products[i].qty_available);
+        if (errorMessages.length > 0 && !errorMessages[0].startsWith("You would like")) {
+            hasErrors = true;
+            break;
+        }
+    }
+    if (hasErrors) {
+        event.preventDefault(); // prevent form submission
+        window.location.href = window.location.pathname + '?inputErr=true&' + new URLSearchParams(new FormData(qty_form)).toString(); // reload the page with error message and input values
+    }
+});
 
 
 
@@ -178,6 +194,7 @@ function stickyNav() {
 let params = (new URL(document.location)).searchParams;
 
 window.onload = function() {
+    console.log('window.onload function called');
     /* If there is a server side validation error
     Display message to user and allow them to edit their inputs
     User input is made sticky by retrieving quantities from the URL 
