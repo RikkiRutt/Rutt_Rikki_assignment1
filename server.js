@@ -2,9 +2,16 @@
 // Importing the Express.js framework 
 const express = require('express');
 
+//dynamic update w/websockets
+const WebSocket = require('ws');
+
 // Create an instance of the Express application called "app"
 // app will be used to define routes, handle requests, etc
 const app = express();
+
+//dynamic update w/websockets
+const server = require('http').createServer(app);
+const wss = new WebSocket.Server({ server }); 
 
 //Require the querystring middleware
 //Used to convert JacaScript into a URL query string
@@ -24,23 +31,34 @@ __dirname + "./products.json" specifies the location of products.json*/
 //Route all othjer GET request to serve static files from a directory named "public"
 app.use(express.static(__dirname + '/public'));
 
-//start the server listen on port 8080 for incoming http requests
-app.listen(8080, () => console.log(`listening on port 8080`));
+// Broadcast function to send data to all connected clients
+wss.broadcast = function broadcast(data) {
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(data);
+        }
+    });
+};
+
+// Listen for connections
+wss.on('connection', function connection(ws) {
+    console.log('Client connected');
+});
 
 const products = require(__dirname + "/products.json");
 
 // Define a route for handling a GET request to a path that matches "./products.js"
 app.get('/products.js', function(request, response, next) {
-	// Send the response as JS
-	response.type('.js');
-	
-	// Create a JS string (products_str) that contains data loaded from the products.json file
+    // Send the response as JS
+    response.type('.js');
+
+    // Create a JS string (products_str) that contains data loaded from the products.json file
 	// Convert the JS string into a JSON string and embed it within variable products
-	let products_str = `let products = ${JSON.stringify(products)};`;
-	
-	// Send the string in response to the GET request
-	response.send(products_str);
-	console.log(products_str);
+    let products_str = `let products = ${JSON.stringify(products)};`;
+
+    // Send the string in response to the GET request
+    response.send(products_str);
+    console.log(products_str);
 });
 
 // add express middleware urlencoded so the post data can be decoded from browser body
@@ -48,91 +66,93 @@ app.use(express.urlencoded({extended: true}));
 
 //add a qty_sold variable for each product
 for (let i in products) {
-	products.forEach((prod, i ) => {prod.qty_sold = 0});
+    products.forEach((prod, i ) => {prod.qty_sold = 0});
 }
 
 //respint to a post method to the path /process_purchase (from products_display)
 //handle a post request to the path process_purchase
 app.post("/process_purchase", function(request, response) { 
 	//extract the content of the request body
-	let POST = request.body;
+    let POST = request.body;
 
 	//asume input boxes are initially empty
-	let has_qty = false;
+    let has_qty = false;
 
 	//create an object to store error messafe for each input
-	let errorObject = {};
+    let errorObject = {};
 
 	//iterate for each product
-	for (let i in products) {
-		let qty = POST[`qty${[i]}`];
-		has_qty = has_qty || (qty > 0)
+    for (let i in products) {
+        let qty = POST[`qty${[i]}`];
+        has_qty = has_qty || (qty > 0)
 
-		//validate using update validate quantity function
-		let errorMessages = validateQuantity(qty, products[i].qty_available);
+    	//validate using update validate quantity function
+        let errorMessages = validateQuantity(qty, products[i].qty_available);
 
-		//store err message if any
-		if (errorMessages.length > 0) {
-			errorObject[`qty${[i]}_error`] = errorMessages.join(',');
-		}
-	}
+ 		//store err message if any       
+        if (errorMessages.length > 0) {
+            errorObject[`qty${[i]}_error`] = errorMessages.join(',');
+        }
+    }
 
 	// if all input are empty with no errors
-	if (has_qty == false && Object.keys(errorObject).lenght == 0) {
-		//redir to the products page with error parameter in url
-		responce.redirect("./product_display.html?error");
-	}
-	//if has input an no errors
+    if (has_qty == false && Object.keys(errorObject).lenght == 0) {
+        //redir to the products page with error parameter in url
+        responce.redirect("./product_display.html?error");
+    }
+    //if has input an no errors
 else if (has_qty == true && Object.keys(errorObject).length == 0) {
-	//update product qyantites and redir to the invoice page with valid data
-	for (let i in products) {
-		let qty = POST[`qty${[i]}`];
+    //update product qyantites and redir to the invoice page with valid data
+    for (let i in products) {
+        let qty = POST[`qty${[i]}`];
 
-		//update quantity sold and available for the current product
-		products[i].qty_sold += Number(qty);
-		products[i].qty_available = products[i].qty_available -qty;
-	}
+        //update quantity sold and available for the current product
+        products[i].qty_sold += Number(qty);
+        products[i].qty_available = products[i].qty_available -qty;
 
-	//redir to the invoice page with valid data in url
-	response.redirect("./invoice.html?valid&" + qs.stringify(POST));
+        // Broadcast the updated inventory to all connected clients
+        wss.broadcast(JSON.stringify(products));
+    }
+
+    //redir to the invoice page with valid data in url    
+    response.redirect("./invoice.html?valid&" + qs.stringify(POST));
 }
-	//if input error(aside no inputs)
-	else if (Object.keys(errorObject).length > 0) {
-		//redir to products page with input error message in url
-	response.redirect("./product_display.html?" + qs.stringify(POST) + `&inputErr`);
+//if input error(aside no inputs)
+    else if (Object.keys(errorObject).length > 0) {
+    //redir to products page with input error message in url    
+    response.redirect("./product_display.html?" + qs.stringify(POST) + `&inputErr`);
 }
 });
 
 //function to validate quantity entered by user against available quantity
 function validateQuantity(quantity, availableQuantity) {
-	let errors = [];  //initialize array to hold error message
+    let errors = []; // Initialize an array to hold error messages
 
-	quantity = Number(quantity); //convert quantity to number
+    quantity=Number(quantity);
 
-	switch (true) {
-		case isNaN(quantity)  || quantity === '':
-			errors.push("Not a number. Please enter a non-negative quantity to order.");
-			break;
-		case quantity < 0&& !Number.isInteger(quantity):
-			errors.push("Negative inventory and not an integer. Please enter a non-negitive quantity.");
-			break;
-		case quantity < 0:
-			errors.push("Negative inventory. Please enter a non-negitive quantity to order.");
-			break;
-		case quantity != 0 && !Number.isInteger(quantity):
-			errors.push("Not an integer. Please enter a non-negative quantity to order.");
-			break;
-		case quantity > availableQuantity:
-			errors.push(`We do not have ${quantity} available.`);
-			break;
+    if ((isNaN(quantity)) && (quantity != '')) {
+        errors.push("Not a number. Please enter a non-negative quantity to order.");
+    } else if (quantity < 0 && !Number.isInteger(quantity)) {
+        errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
+    } else if (quantity < 0) {
+        errors.push("Negative quantity. Please enter a non-negative quantity to order.");
+    } else if (quantity !=0 && !Number.isInteger(quantity)) {
+        errors.push("Not an Integer. Please enter a non-negative quantity to order.");
+    } else if (quantity > availableQuantity) {
+        errors.push(`We do not have ${quantity} available.`);
+    }
 
-	}
-	return errors;
-}
+    // If there are no errors, add a success message to the array
+    if (errors.length === 0) {
+        errors.push(`You would like ${quantity}`);
+    }
+
+    return errors; // Return the array of errors
+};
+
 
 // Route all other GET requests to serve static files from a directory named "public"
 app.use(express.static(__dirname + '/public'));
 
-
 // Start the server; listen on port 8080 for incoming HTTP requests
-// app.listen(8080, () => console.log(`listening on port 8080`)); 
+server.listen(8080, () => console.log(`listening on port 8080`));

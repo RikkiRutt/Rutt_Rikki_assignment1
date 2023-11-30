@@ -1,4 +1,35 @@
 //code used from sal and bing chat gpt
+
+//code for dinamic update
+// Establish WebSocket connection
+const socket = new WebSocket('ws://localhost:8080');
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+    console.log('WebSocket connection opened');
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+    console.log('Message from server:', event.data);
+
+    // Parse the updated inventory from the server
+    const updatedInventory = JSON.parse(event.data);
+
+    // Update the product information on the page
+    for (let i in updatedInventory) {
+        // Get the HTML elements for the product
+        const productCard = document.querySelector(`.product_card:nth-child(${i+1})`);
+        const qtyAvailableElement = productCard.querySelector('.qty-available');
+        const qtySoldElement = productCard.querySelector('#qty_sold'+i);
+
+        // Update the quantity available and quantity sold
+        qtyAvailableElement.textContent = "Available: " + updatedInventory[i].qty_available;
+        qtySoldElement.textContent = "Sold: " + updatedInventory[i].qty_sold;
+    }
+});
+
+
 // Populate the DOM Form with the product details
 for (let i = 0; i < products.length; i++) {
     // Create a product card for each product
@@ -64,31 +95,26 @@ function validateQuantity(quantity, availableQuantity) {
 
     quantity=Number(quantity);
 
-    switch (true) {
-        case (isNaN(quantity)) && (quantity != ''):
-            errors.push("Not a number. Please enter a non-negative quantity to order.");
-            break;
-        case quantity < 0 && !Number.isInteger(quantity):
-            errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
-            break;
-        case quantity < 0:
-            errors.push("Negative quantity. Please enter a non-negative quantity to order.");
-            break;
-        case quantity !=0 && !Number.isInteger(quantity):
-            errors.push("Not an Integer. Please enter a non-negative quantity to order.");
-            break;
-        case quantity > availableQuantity:
-            errors.push(`We do not have ${quantity} available.`);
-            break;
-        // No default case needed as no errors means the array remains empty
+    if ((isNaN(quantity)) && (quantity != '')) {
+        errors.push("Not a number. Please enter a non-negative quantity to order.");
+    } else if (quantity < 0 && !Number.isInteger(quantity)) {
+        errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
+    } else if (quantity < 0) {
+        errors.push("Negative quantity. Please enter a non-negative quantity to order.");
+    } else if (quantity !=0 && !Number.isInteger(quantity)) {
+        errors.push("Not an Integer. Please enter a non-negative quantity to order.");
+    } else if (quantity > availableQuantity) {
+        errors.push(`We do not have ${quantity} available.`);
     }
-        // If there are no errors, add a success message to the array
+
+    // If there are no errors, add a success message to the array
     if (errors.length === 0) {
         errors.push(`You would like ${quantity}`);
     }
 
     return errors; // Return the array of errors
 };
+
 
 
 // CHECK INPUT BOXES AGAINST DATA VALIDATION FUNCTION
