@@ -1,5 +1,49 @@
 //code used from sal and bing chat gpt
 
+// Get the URL
+let params = (new URL(document.location)).searchParams;
+
+window.onload = function() {
+    console.log('window.onload function called');
+    /* If there is a server side validation error
+    Display message to user and allow them to edit their inputs
+    User input is made sticky by retrieving quantities from the URL 
+    Those inputs are validated by isNonNegInt again */
+
+    if (params.has('error')) {
+       
+        document.getElementById('errMsg').innerHTML = "No quantities selected.";
+        setTimeout(() => {
+            document.getElementById('errMsg').innerHTML = "";
+        }, 2000);
+    } 
+    else if (params.has('inputErr')) {
+        document.getElementById('errMsg').innerHTML = "Please fix the quantity errors before proceeding.";
+        setTimeout(() => {
+            document.getElementById('errMsg').innerHTML = "";
+        }, 2000);
+
+        for (let i in products) {
+            let qtyInput = document.querySelector(`#qty${i}_entered`);
+            // Set the input field's value to the quantity from the URL parameters
+            if (params.has(`qty${i}`)) {
+                qtyInput.value = params.get(`qty${i}`);
+            }
+            let qtyError = document.getElementById(`qty${[i]}_error`);
+
+            // Validate the quantity and display errors
+            let errorMessages = validateQuantity(qtyInput.value, products[i].qty_available);
+            if (errorMessages.length > 0) {
+                qtyError.innerHTML = errorMessages.join('<br>');
+                qtyInput.parentElement.style.borderColor = "red";
+            } else {
+                qtyError.innerHTML = "";
+                qtyInput.parentElement.style.borderColor = "black";
+            }
+        }
+    }
+}
+
 //code for dinamic update
 // Establish WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
@@ -190,47 +234,3 @@ function stickyNav() {
     }
 }
 
-// Get the URL
-let params = (new URL(document.location)).searchParams;
-
-window.onload = function() {
-    console.log('window.onload function called');
-    /* If there is a server side validation error
-    Display message to user and allow them to edit their inputs
-    User input is made sticky by retrieving quantities from the URL 
-    Those inputs are validated by isNonNegInt again */
-
-    if (params.has('error')) {
-       
-        document.getElementById('errMsg').innerHTML = "No quantities selected.";
-        setTimeout(() => {
-            document.getElementById('errMsg').innerHTML = "";
-        }, 2000);
-    } 
-    else if (params.has('inputErr')) {
-        document.getElementById('errMsg').innerHTML = "Please fix errors before proceeding.";
-        setTimeout(() => {
-            document.getElementById('errMsg').innerHTML = "";
-        }, 2000);
-
-        for (let i in products) {
-            let qtyInput = qty_form[`qty${[i]}_entered`];
-            let qtyError = document.getElementById(`qty${[i]}_error`);
-
-            // Set the value from URL parameters
-            if (params.get(`qty${i}`) !== null) {
-                qtyInput.value = params.get(`qty${i}`);
-            }
-
-            // Validate the quantity and display errors
-            let errorMessages = validateQuantity(qtyInput.value, products[i].qty_available);
-            if (errorMessages.length > 0) {
-                qtyError.innerHTML = errorMessages.join('<br>');
-                qtyInput.parentElement.style.borderColor = "red";
-            } else {
-                qtyError.innerHTML = "";
-                qtyInput.parentElement.style.borderColor = "black";
-            }
-        }
-    }
-}
