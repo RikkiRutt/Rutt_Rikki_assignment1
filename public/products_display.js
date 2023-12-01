@@ -161,14 +161,14 @@ function validateQuantity(quantity, availableQuantity) {
         errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
     } else if (quantity < 0) {
         errors.push("Negative quantity. Please enter a non-negative quantity to order.");
-    } else if (quantity !=0 && !Number.isInteger(quantity)) {
+    } else if (quantity !=0 && quantity != '' && !Number.isInteger(quantity)) {
         errors.push("Not an Integer. Please enter a non-negative quantity to order.");
     } else if (quantity > availableQuantity) {
         errors.push(`We do not have ${quantity} available.`);
     }
 
     // If there are no errors, add a success message to the array
-    if (errors.length === 0) {
+    if (errors.length === 0 && quantity != '') {
         errors.push(`You would like ${quantity}`);
     }
 
