@@ -44,6 +44,9 @@ window.onload = function() {
     }
 }
 
+
+/* I think I can get rid of this whole section
+
 //code for dinamic update
 // Establish WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
@@ -71,7 +74,7 @@ socket.addEventListener('message', function (event) {
         qtyAvailableElement.textContent = "Available: " + updatedInventory[i].qty_available;
         qtySoldElement.textContent = "Sold: " + updatedInventory[i].qty_sold;
     }
-});
+});*/
 
 
 // Populate the DOM Form with the product details
@@ -122,6 +125,8 @@ for (let i = 0; i < products.length; i++) {
 }
 
 
+/* I think I might be able to get rid of theis section
+
 // Add event listener for purchase sub with errors present
 let qty_form = document.getElementById('qty_form'); 
 qty_form.addEventListener('submit', function(event) {
@@ -140,7 +145,7 @@ qty_form.addEventListener('submit', function(event) {
     }
 });
 
-
+*/
 
 
 

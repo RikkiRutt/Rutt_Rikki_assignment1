@@ -96,9 +96,9 @@ app.post("/process_purchase", function(request, response) {
     }
 
 	// if all input are empty with no errors
-    if (has_qty == false && Object.keys(errorObject).lenght == 0) {
+    if (has_qty == false && Object.keys(errorObject).length == 0) {
         //redir to the products page with error parameter in url
-        responce.redirect("./product_display.html?error");
+        response.redirect("./product_display.html?error");
     }
     //if has input an no errors
 else if (has_qty == true && Object.keys(errorObject).length == 0) {
