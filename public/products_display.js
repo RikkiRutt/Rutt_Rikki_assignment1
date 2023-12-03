@@ -1,5 +1,4 @@
 //code used from sal and bing chat gpt
-
 // Get the URL
 let params = (new URL(document.location)).searchParams;
 
@@ -11,13 +10,12 @@ window.onload = function() {
     Those inputs are validated by isNonNegInt again */
 
     if (params.has('error')) {
-       
+
         document.getElementById('errMsg').innerHTML = "No quantities selected.";
         setTimeout(() => {
             document.getElementById('errMsg').innerHTML = "";
         }, 2000);
-    } 
-    else if (params.has('inputErr')) {
+    } else if (params.has('inputErr')) {
         document.getElementById('errMsg').innerHTML = "Please fix the quantity errors before proceeding.";
         setTimeout(() => {
             document.getElementById('errMsg').innerHTML = "";
@@ -43,39 +41,6 @@ window.onload = function() {
         }
     }
 }
-
-
-/* I think I can get rid of this whole section
-
-//code for dinamic update
-// Establish WebSocket connection
-const socket = new WebSocket('ws://localhost:8080');
-
-// Connection opened
-socket.addEventListener('open', function (event) {
-    console.log('WebSocket connection opened');
-});
-
-// Listen for messages
-socket.addEventListener('message', function (event) {
-    console.log('Message from server:', event.data);
-
-    // Parse the updated inventory from the server
-    const updatedInventory = JSON.parse(event.data);
-
-    // Update the product information on the page
-    for (let i in updatedInventory) {
-        // Get the HTML elements for the product
-        const productCard = document.querySelector(`.product_card:nth-child(${i+1})`);
-        const qtyAvailableElement = productCard.querySelector('.qty-available');
-        const qtySoldElement = productCard.querySelector('#qty_sold'+i);
-
-        // Update the quantity available and quantity sold
-        qtyAvailableElement.textContent = "Available: " + updatedInventory[i].qty_available;
-        qtySoldElement.textContent = "Sold: " + updatedInventory[i].qty_sold;
-    }
-});*/
-
 
 // Populate the DOM Form with the product details
 for (let i = 0; i < products.length; i++) {
@@ -124,41 +89,11 @@ for (let i = 0; i < products.length; i++) {
     `;
 }
 
-
-/* I think I might be able to get rid of theis section
-
-// Add event listener for purchase sub with errors present
-let qty_form = document.getElementById('qty_form'); 
-qty_form.addEventListener('submit', function(event) {
-    let hasErrors = false;
-    for (let i in products) {
-        let qtyInput = qty_form[`qty${[i]}_entered`];
-        let errorMessages = validateQuantity(qtyInput.value, products[i].qty_available);
-        if (errorMessages.length > 0 && !errorMessages[0].startsWith("You would like")) {
-            hasErrors = true;
-            break;
-        }
-    }
-    if (hasErrors) {
-        event.preventDefault(); // prevent form submission
-        window.location.href = window.location.pathname + '?inputErr=true&' + new URLSearchParams(new FormData(qty_form)).toString(); // reload the page with error message and input values
-    }
-});
-
-*/
-
-
-
-
-
-
-// PERFORM CLIENT-SIDE DATA VALIDATION
-
-// Updated validateQuantity function
+// Do client side validation 
 function validateQuantity(quantity, availableQuantity) {
     let errors = []; // Initialize an array to hold error messages
 
-    quantity=Number(quantity);
+    quantity = Number(quantity);
 
     if ((isNaN(quantity)) && (quantity != '')) {
         errors.push("Not a number. Please enter a non-negative quantity to order.");
@@ -166,7 +101,7 @@ function validateQuantity(quantity, availableQuantity) {
         errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
     } else if (quantity < 0) {
         errors.push("Negative quantity. Please enter a non-negative quantity to order.");
-    } else if (quantity !=0 && quantity != '' && !Number.isInteger(quantity)) {
+    } else if (quantity != 0 && quantity != '' && !Number.isInteger(quantity)) {
         errors.push("Not an Integer. Please enter a non-negative quantity to order.");
     } else if (quantity > availableQuantity) {
         errors.push(`We do not have ${quantity} available.`);
@@ -179,8 +114,6 @@ function validateQuantity(quantity, availableQuantity) {
 
     return errors; // Return the array of errors
 };
-
-
 
 // CHECK INPUT BOXES AGAINST DATA VALIDATION FUNCTION
 // Remove leading 0's
@@ -218,16 +151,16 @@ function checkInputTextbox(textBox, availableQuantity) {
     }
 }
 
-
-
 // STICKY NAV BAR: Referenced from https://www.w3schools.com/howto/howto_js_navbar_sticky.asp
-window.onscroll = function() {stickyNav()};
+window.onscroll = function() {
+    stickyNav()
+};
 
 // Get the navbar using its id
 let navbar = document.getElementById("sticky-navbar");
 
 // offsetTop returns the top position relative to the parent (documentation: https://www.w3schools.com/jsref/prop_element_offsettop.asp)
-    // The parent of navbar is body
+// The parent of navbar is body
 let sticky = navbar.offsetTop;
 
 function stickyNav() {
