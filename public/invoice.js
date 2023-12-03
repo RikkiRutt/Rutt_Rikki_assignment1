@@ -8,7 +8,7 @@ window.onload = function() {
     if (!params.has('valid')) {
         document.write(`
             <head>
-                <link rel="stylesheet" href="syle.css">
+                <link rel="stylesheet" href="style.css">
             </head>
             <body style="text-align: center; margin-top: 10%;">
                 <h2>ERROR: No form submission detected.</h2>

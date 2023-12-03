@@ -10886,3 +10886,41 @@ textarea.form-control-lg {
   border-color: #555 transparent transparent transparent;
 }
 
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #dee2e6;
+}
+
+th, td {
+  padding: 15px;
+  text-align: center;
+}
+
+/* Add striped rows */
+tr:nth-child(even) {
+  background-color: #f8f9fa; /* Light background color for even rows */
+}
+
+/* Header Row Styling */
+th {
+  background-color: #343a40 !important; /* Dark background color for header cells */
+  color: #ffffff; /* White text color */
+}
+
+/* Cell Borders and Padding */
+th, td {
+  padding: 15px;
+  text-align: center;
+  border: 1px solid #dee2e6; /* Gray border for cells */
+}
+
+/* Hover Effect */
+tr:hover {
+  background-color: #f2f2f2; /* Light background color on hover */
+}
