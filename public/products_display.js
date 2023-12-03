@@ -46,49 +46,70 @@ window.onload = function() {
 // Populate the DOM Form with the product details
 for (let i = 0; i < products.length; i++) {
     // Create a product card for each product
-    document.querySelector('.row').innerHTML += `
-        <div class="col-md-4 product_card" style="margin-bottom: 40px; padding: 30px;">
-            <div>
-                <h5 class="product_name"><b>${products[i].model}</b></h5>
-                <h5>$${(products[i].price).toFixed(2)}</h5>
-            </div>  
-            <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
-            <div style="height: 90px;">
-                <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
-                    <tr>
-                        <!-- Display available quantity for the product -->
-                        <td style="text-align: left; width: 35%;">Available: ${products[i].qty_available}</td>
+    let productCard = document.createElement('div');
+    productCard.className = 'col-md-4 product_card';
+    productCard.style = 'margin-bottom: 40px; padding: 30px;';
 
-                        <!-- Label for quantity -->
-                        <td style="text-align: left; width: 75%;"><label id="qty${[i]}_label" style="margin: 6px 0; padding-right: 10px;">Qty:</label></td>
-                    </tr>
-                    <tr>
-                        <!-- Display sold quantity for the product -->
-                        <td style="text-align: left; width: 35%;" id="qty_sold${i}">Sold: ${products[i].qty_sold}</td>
+    productCard.innerHTML = `
+        <div>
+            <h5 class="product_name"><b>${products[i].model}</b></h5>
+            <h5>$${(products[i].price).toFixed(2)}</h5>
+        </div>  
+        <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
+        <div style="height: 90px;">
+            <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
+                <tr>
+                    <!-- Display available quantity for the product -->
+                    <td style="text-align: left; width: 35%;">Available: ${products[i].qty_available}</td>
 
-                        <!-- Input field for quantity and buttons to increase/decrease -->
-                        <td style="text-align: left; width: 35%;" rowspan="2">
-                            <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
-                                <!-- Decrease quantity button with an onclick event -->
-                                <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 40px; margin-bottom: 11px;" onclick="document.getElementById('qty${[i]}_entered').value--; checkInputTextbox(document.getElementById('qty${[i]}_entered'), ${products[i].qty_available});">-</button>
+                    <!-- Label for quantity -->
+                    <td style="text-align: left; width: 75%;"><label id="qty${[i]}_label" style="margin: 6px 0; padding-right: 10px;">Qty:</label></td>
+                </tr>
+                <tr>
+                    <!-- Display sold quantity for the product -->
+                    <td style="text-align: left; width: 35%;" id="qty_sold${i}">Sold: ${products[i].qty_sold}</td>
 
-                                <!-- Input field for quantity with onkeyup event -->
-                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" onkeyup="checkInputTextbox(this,${products[i].qty_available})">
+                    <!-- Input field for quantity and buttons to increase/decrease -->
+                    <td style="text-align: left; width: 35%;" rowspan="2">
+                        <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
+                            <!-- Decrease quantity button with an onclick event -->
+                            <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 40px; margin-bottom: 11px;" onclick="changeQuantity(${i}, -1)">-</button>
 
-                                <!-- Increase quantity button with an onclick event -->
-                                <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="document.getElementById('qty${[i]}_entered').value++; checkInputTextbox(document.getElementById('qty${[i]}_entered'), ${products[i].qty_available});">+</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <!-- Error message for quantity validation -->
-                        <td colspan="3" style="padding-top: 60px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
-                    </tr>
-                </table>
-            </div>  
-        </div>
+                            <!-- Input field for quantity -->
+                            <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" oninput="validateAndDisplayMessage(this, ${products[i].qty_available})">
+
+                            <!-- Increase quantity button with an onclick event -->
+                            <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="changeQuantity(${i}, 1)">+</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- Error message for quantity validation -->
+                    <td colspan="3" style="padding-top: 60px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
+                </tr>
+            </table>
+        </div>  
     `;
+
+    // Add the product card to the row
+    document.querySelector('.row').appendChild(productCard);
 }
+
+// Function to handle quantity changes
+function changeQuantity(index, delta) {
+    let inputField = document.getElementById(`qty${index}_entered`);
+    let currentValue = parseInt(inputField.value, 10) || 0;
+    let newValue = currentValue + delta;
+
+    // Update the input field value
+    inputField.value = newValue;
+
+    // Trigger input event for immediate validation
+    inputField.dispatchEvent(new Event('input'));
+}
+
+
+
 
 // PERFORM CLIENT-SIDE DATA VALIDATION
 
@@ -119,10 +140,9 @@ function validateQuantity(quantity, availableQuantity) {
 
 // CHECK INPUT BOXES AGAINST DATA VALIDATION FUNCTION
 // Remove leading 0's
-// Updated checkInputTextbox function
-function checkInputTextbox(textBox, availableQuantity) {
+function validateAndDisplayMessage(textBox, availableQuantity) {
     let str = String(textBox.value);
-
+    
     // Check if the first character is '0' and remove it if found
     if (str.charAt(0) == '0') {
         textBox.value = Number(str.slice(0, 0) + str.slice(1, str.length));
@@ -143,13 +163,13 @@ function checkInputTextbox(textBox, availableQuantity) {
         textBox.parentElement.style.borderColor = 'red';
         errorDisplay.innerHTML = errorMessages[0];
     } else {
-        // If no error messages, reset styles to black
-        errorDisplay.style.color = 'black';
-        textBox.parentElement.style.borderColor = 'black';
-        errorDisplay.innerHTML = "";
+        // If no error messages, change the color to blue
+        errorDisplay.style.color = 'blue';
+        textBox.parentElement.style.borderColor = 'blue';
+        errorDisplay.innerHTML = `You have selected ${inputValue} quantity.`;
     }
-
 }
+
 
 
 
