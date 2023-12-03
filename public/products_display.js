@@ -156,7 +156,7 @@ function validateAndDisplayMessage(textBox, availableQuantity) {
         // If no error messages, change the color to blue
         errorDisplay.style.color = 'blue';
         textBox.parentElement.style.borderColor = 'blue';
-        errorDisplay.innerHTML = `You have selected ${inputValue} quantity.`;
+        errorDisplay.innerHTML = `You have selected ${inputValue}.`;
     }
 }
 
