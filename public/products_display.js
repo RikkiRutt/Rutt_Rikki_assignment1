@@ -171,4 +171,3 @@ function stickyNav() {
         navbar.classList.remove("sticky");
     }
 }
-
