@@ -42,7 +42,7 @@ window.onload = function() {
         }
     }
 }
-
+//Odd added code in this section before client side validation was gpt to get the blue message for valid quantitys input
 // Populate the DOM Form with the product details
 for (let i = 0; i < products.length; i++) {
     // Create a product card for each product
@@ -108,12 +108,7 @@ function changeQuantity(index, delta) {
     inputField.dispatchEvent(new Event('input'));
 }
 
-
-
-
-// PERFORM CLIENT-SIDE DATA VALIDATION
-
-// Updated validateQuantity function
+// Do client side validation
 function validateQuantity(quantity, availableQuantity) {
     let errors = []; // Initialize an array to hold error messages
 
@@ -130,19 +125,14 @@ function validateQuantity(quantity, availableQuantity) {
     } else if (quantity > availableQuantity) {
         errors.push(`We do not have ${quantity} available.`);
     }
-
-
-
     return errors; // Return the array of errors
 };
-
-
 
 // CHECK INPUT BOXES AGAINST DATA VALIDATION FUNCTION
 // Remove leading 0's
 function validateAndDisplayMessage(textBox, availableQuantity) {
     let str = String(textBox.value);
-    
+
     // Check if the first character is '0' and remove it if found
     if (str.charAt(0) == '0') {
         textBox.value = Number(str.slice(0, 0) + str.slice(1, str.length));
@@ -169,9 +159,6 @@ function validateAndDisplayMessage(textBox, availableQuantity) {
         errorDisplay.innerHTML = `You have selected ${inputValue} quantity.`;
     }
 }
-
-
-
 
 // STICKY NAV BAR: Referenced from https://www.w3schools.com/howto/howto_js_navbar_sticky.asp
 window.onscroll = function() {
