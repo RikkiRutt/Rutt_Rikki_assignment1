@@ -68,18 +68,26 @@ app.post("/process_purchase", function (request, response) {
         }
     }
 
-    // Redirect based on validation results
+    // Check if all quantities are valid before processing the purchase
     if (!hasQty && Object.keys(errorObject).length === 0) {
         response.redirect("./product_display.html?error");
     } else if (hasQty && Object.keys(errorObject).length === 0) {
-        // Update product quantities and broadcast changes
-        for (let i in products) {
-            let qty = POST[`qty${i}`];
-            products[i].qty_sold += Number(qty);
-            products[i].qty_available -= Number(qty); // Corrected this line
+        // Check quantities against the server's current state before processing the purchase
+        const isValidPurchase = checkQuantitiesOnServer(POST);
+        
+        if (isValidPurchase) {
+            // Update product quantities and broadcast changes
+            for (let i in products) {
+                let qty = POST[`qty${i}`];
+                products[i].qty_sold += Number(qty);
+                products[i].qty_available -= Number(qty); // Corrected this line
+            }
+            wss.broadcast(JSON.stringify(products));
+            response.redirect("./invoice.html?valid&" + qs.stringify(POST));
+        } else {
+            // Redirect with an error message if quantities are no longer available on the server
+            response.redirect("./product_display.html?unavailable");
         }
-        wss.broadcast(JSON.stringify(products));
-        response.redirect("./invoice.html?valid&" + qs.stringify(POST));
     } else if (Object.keys(errorObject).length > 0) {
         response.redirect("./product_display.html?" + qs.stringify(POST) + `&inputErr`);
     }
@@ -106,6 +114,18 @@ function validateQuantity(quantity, availableQuantity) {
     return errors;
 }
 
+// Function to check quantities against the server's current state
+function checkQuantitiesOnServer(POST) {
+    for (let i in products) {
+        let qty = POST[`qty${i}`];
+        if (Number(qty) > products[i].qty_available) {
+            return false; // Return false if any quantity is no longer available on the server
+        }
+    }
+    return true; // Return true if all quantities are valid
+}
+
 // Start the server; listen on port 8080 for incoming HTTP requests
 server.listen(8080, () => console.log(`listening on port 8080`));
+
 
