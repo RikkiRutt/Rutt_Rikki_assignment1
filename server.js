@@ -1,3 +1,5 @@
+//code used from chat and sal
+//added from chat for dynamic update using websocket
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');

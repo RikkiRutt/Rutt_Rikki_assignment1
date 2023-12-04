@@ -1,4 +1,4 @@
-//code used from sal and bing chat gpt
+////code used from sal, chat, and and bing chat gpt
 // Get the URL
 let params = (new URL(document.location)).searchParams;
 
@@ -16,20 +16,28 @@ window.onload = function() {
         `)
     }
 }
-
+//Initialize the subtotal to zero
 let subtotal = 0;
 
+// Create an empty array to store quantities
+// Loop through each product in the 'products' array
 let qty = [];
 for (let i in products) {
     qty.push(params.get(`qty${i}`));
 }
 
+// Loop through each quantity in the 'qty' array
+// Check if the quantity is 0 or an empty string, and if so, skip to the next iteration
 for (let i in qty) {
     if (qty[i] == 0 || qty[i] == '') continue;
 
+    // Calculate the extended price for the current product based on its quantity and price
     extended_price = (params.get(`qty${i}`) * products[i].price).toFixed(2);
+
+     // Convert the extended price to a number and add it to the subtotal
     subtotal += Number(extended_price);
 
+    //Invoice table of products purchased
     document.querySelector('#invoice_table').innerHTML += `
         <tr style="border: none;">
             <td width="10%"><div class="icon"><img src="${products[i].image}" alt="${products[i].alt}" style="border-radius: 5px;width: 200px; height: 150px;"><div class="popup">${products[i].model}</div>
@@ -63,7 +71,7 @@ else {
     shipping_display = 'FREE';
     total = Number(tax_amt + subtotal + shipping);
 }
-
+ //Table for subtotal, tax, shipping, and total under main invoice table
 document.querySelector('#total_display').innerHTML += `
     <tr style="border-top: 2px solid black;">
         <td colspan="5" style="text-align:center;">Sub-total</td>

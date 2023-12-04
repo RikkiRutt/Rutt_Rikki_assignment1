@@ -1,3 +1,4 @@
+////code used from sal, chat, and bing chat gpt
 // Get the URL
 let params = (new URL(document.location)).searchParams;
 
