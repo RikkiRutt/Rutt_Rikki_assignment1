@@ -50,26 +50,22 @@ socket.addEventListener('message', function (event) {
 
     console.log('Received WebSocket message:', updatedProducts);
 
-// Iterate through products to update the displayed sold quantities
-for (let i in updatedProducts) {
-    // Update the displayed sold quantity
-    let qtySoldElement = document.getElementById(`qty_sold${i}`);
-    if (qtySoldElement) {
-        console.log(`Updating sold quantity for product ${i}: ${updatedProducts[i].qty_sold}`);
-        qtySoldElement.textContent = `Sold: ${updatedProducts[i].qty_sold}`;
-    }
-}
+    // Iterate through products to update the displayed quantities
+    for (let i in updatedProducts) {
+        // Update the displayed sold quantity
+        let qtySoldElement = document.getElementById(`qty_sold${i}`);
+        if (qtySoldElement) {
+            console.log(`Updating sold quantity for product ${i}: ${updatedProducts[i].qty_sold}`);
+            qtySoldElement.textContent = `Sold: ${updatedProducts[i].qty_sold}`;
+        }
 
-// Iterate through products to update the displayed available quantities
-for (let i in updatedProducts) {
-    // Update the displayed available quantity
-    let qtyAvailableElement = document.getElementById(`qty${i}_available`);
-    if (qtyAvailableElement) {
-        console.log(`Updating available quantity for product ${i}: ${updatedProducts[i].qty_available}`);
-        qtyAvailableElement.textContent = `Available: ${updatedProducts[i].qty_available}`;
+        // Update the displayed available quantity
+        let qtyAvailableElement = document.getElementById(`qty${i}_available`);
+        if (qtyAvailableElement) {
+            console.log(`Updating available quantity for product ${i}: ${updatedProducts[i].qty_available}`);
+            qtyAvailableElement.textContent = `Available: ${updatedProducts[i].qty_available}`;
+        }
     }
-}
-
 });
 
 
