@@ -1,17 +1,18 @@
-//code used from sal and bing chat gpt
-
 // Get the URL
 let params = (new URL(document.location)).searchParams;
 
+// Add this line to create a WebSocket connection
+const socket = new WebSocket('ws://localhost:8080');
+
+// Update the window.onload function to handle WebSocket messages
 window.onload = function() {
     console.log('window.onload function called');
-    /* If there is a server side validation error
+
+    /* If there is a server-side validation error
     Display message to user and allow them to edit their inputs
     User input is made sticky by retrieving quantities from the URL 
     Those inputs are validated by isNonNegInt again */
-
     if (params.has('error')) {
-
         document.getElementById('errMsg').innerHTML = "No quantities selected.";
         setTimeout(() => {
             document.getElementById('errMsg').innerHTML = "";
@@ -41,59 +42,86 @@ window.onload = function() {
             }
         }
     }
-}
-//Odd added code in this section before client side validation was gpt to get the blue message for valid quantitys input
-// Populate the DOM Form with the product details
-for (let i = 0; i < products.length; i++) {
-    // Create a product card for each product
-    let productCard = document.createElement('div');
-    productCard.className = 'col-md-4 product_card';
-    productCard.style = 'margin-bottom: 40px; padding: 30px;';
 
-    productCard.innerHTML = `
-        <div>
-            <h5 class="product_name"><b>${products[i].model}</b></h5>
-            <h5>$${(products[i].price).toFixed(2)}</h5>
-        </div>  
-        <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
-        <div style="height: 90px;">
-            <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
-                <tr>
-                    <!-- Display available quantity for the product -->
-                    <td style="text-align: left; width: 35%;">Available: ${products[i].qty_available}</td>
+// Add an event listener for WebSocket messages
+socket.addEventListener('message', function (event) {
+    // Parse the incoming JSON data
+    const updatedProducts = JSON.parse(event.data);
 
-                    <!-- Label for quantity -->
-                    <td style="text-align: left; width: 75%;"><label id="qty${[i]}_label" style="margin: 6px 0; padding-right: 10px;">Qty:</label></td>
-                </tr>
-                <tr>
-                    <!-- Display sold quantity for the product -->
-                    <td style="text-align: left; width: 35%;" id="qty_sold${i}">Sold: ${products[i].qty_sold}</td>
+    console.log('Received WebSocket message:', updatedProducts);
 
-                    <!-- Input field for quantity and buttons to increase/decrease -->
-                    <td style="text-align: left; width: 35%;" rowspan="2">
-                        <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
-                            <!-- Decrease quantity button with an onclick event -->
-                            <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 40px; margin-bottom: 11px;" onclick="changeQuantity(${i}, -1)">-</button>
+    // Iterate through products to update the displayed quantities
+    for (let i in updatedProducts) {
+        // Update the displayed sold quantity
+        let qtySoldElement = document.getElementById(`qty_sold${i}`);
+        if (qtySoldElement) {
+            console.log(`Updating sold quantity for product ${i}: ${updatedProducts[i].qty_sold}`);
+            qtySoldElement.textContent = `Sold: ${updatedProducts[i].qty_sold}`;
+        }
 
-                            <!-- Input field for quantity -->
-                            <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" oninput="validateAndDisplayMessage(this, ${products[i].qty_available})">
+        // Update the displayed available quantity
+        let qtyAvailableElement = document.getElementById(`qty${i}_available`);
+        if (qtyAvailableElement) {
+            console.log(`Updating available quantity for product ${i}: ${updatedProducts[i].qty_available}`);
+            qtyAvailableElement.textContent = `Available: ${updatedProducts[i].qty_available}`;
+        }
+    }
+});
 
-                            <!-- Increase quantity button with an onclick event -->
-                            <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="changeQuantity(${i}, 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <!-- Error message for quantity validation -->
-                    <td colspan="3" style="padding-top: 60px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
-                </tr>
-            </table>
-        </div>  
-    `;
 
-    // Add the product card to the row
-    document.querySelector('.row').appendChild(productCard);
-}
+    // Odd added code in this section before client-side validation was gpt to get the blue message for valid quantitys input
+    // Populate the DOM Form with the product details
+    for (let i = 0; i < products.length; i++) {
+        // Create a product card for each product
+        let productCard = document.createElement('div');
+        productCard.className = 'col-md-4 product_card';
+        productCard.style = 'margin-bottom: 40px; padding: 30px;';
+
+        productCard.innerHTML = `
+            <div>
+                <h5 class="product_name"><b>${products[i].model}</b></h5>
+                <h5>$${(products[i].price).toFixed(2)}</h5>
+            </div>  
+            <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
+            <div style="height: 90px;">
+                <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
+                    <tr>
+                        <!-- Display available quantity for the product -->
+                        <td style="text-align: left; width: 35%;">Available: ${products[i].qty_available}</td>
+
+                        <!-- Label for quantity -->
+                        <td style="text-align: left; width: 75%;"><label id="qty${[i]}_label" style="margin: 6px 0; padding-right: 10px;">Qty:</label></td>
+                    </tr>
+                    <tr>
+                        <!-- Display sold quantity for the product -->
+                        <td style="text-align: left; width: 35%;" id="qty_sold${i}">Sold: ${products[i].qty_sold}</td>
+
+                        <!-- Input field for quantity and buttons to increase/decrease -->
+                        <td style="text-align: left; width: 35%;" rowspan="2">
+                            <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
+                                <!-- Decrease quantity button with an onclick event -->
+                                <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 40px; margin-bottom: 11px;" onclick="changeQuantity(${i}, -1)">-</button>
+
+                                <!-- Input field for quantity -->
+                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" oninput="validateAndDisplayMessage(this, ${products[i].qty_available})">
+
+                                <!-- Increase quantity button with an onclick event -->
+                                <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="changeQuantity(${i}, 1)">+</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- Error message for quantity validation -->
+                        <td colspan="3" style="padding-top: 60px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
+                    </tr>
+                </table>
+            </div>  
+        `;
+
+        // Add the product card to the row
+        document.querySelector('.row').appendChild(productCard);
+    }
+};
 
 // Function to handle quantity changes
 function changeQuantity(index, delta) {
@@ -108,7 +136,7 @@ function changeQuantity(index, delta) {
     inputField.dispatchEvent(new Event('input'));
 }
 
-// Do client side validation
+// Do client-side validation
 function validateQuantity(quantity, availableQuantity) {
     let errors = []; // Initialize an array to hold error messages
 
@@ -179,4 +207,5 @@ function stickyNav() {
     } else {
         navbar.classList.remove("sticky");
     }
-}
+};
+
