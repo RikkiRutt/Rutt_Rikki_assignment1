@@ -184,8 +184,14 @@ function validateQuantity(quantity, availableQuantity) {
 
     quantity = Number(quantity);
 
-    if (isNaN(quantity) || quantity < 0 || !Number.isInteger(quantity)) {
-        errors.push("Please enter a valid non-negative integer quantity to order.");
+    if ((isNaN(quantity)) && (quantity != '')) {
+        errors.push("Not a number. Please enter a non-negative quantity to order.");
+    } else if (quantity < 0 && !Number.isInteger(quantity)) {
+        errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
+    } else if (quantity < 0) {
+        errors.push("Negative quantity. Please enter a non-negative quantity to order.");
+    } else if (quantity !=0 && quantity != '' && !Number.isInteger(quantity)) {
+        errors.push("Not an Integer. Please enter a non-negative quantity to order.");
     } else if (quantity > availableQuantity) {
         errors.push(`We do not have ${quantity} available.`);
     }
