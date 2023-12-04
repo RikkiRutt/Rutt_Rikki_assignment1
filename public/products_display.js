@@ -5,72 +5,67 @@ let params = (new URL(document.location)).searchParams;
 const socket = new WebSocket('ws://localhost:8080');
 
 // Update the window.onload function to handle WebSocket messages
-window.onload = function() {
+window.onload = function () {
     console.log('window.onload function called');
 
-    /* If there is a server-side validation error
-    Display message to user and allow them to edit their inputs
-    User input is made sticky by retrieving quantities from the URL 
-    Those inputs are validated by isNonNegInt again */
+    // Check for server-side validation errors
     if (params.has('error')) {
-        document.getElementById('errMsg').innerHTML = "No quantities selected.";
+        document.getElementById('errMsg').innerHTML = 'No quantities selected.';
         setTimeout(() => {
-            document.getElementById('errMsg').innerHTML = "";
+            document.getElementById('errMsg').innerHTML = '';
         }, 2000);
     } else if (params.has('inputErr')) {
-        document.getElementById('errMsg').innerHTML = "Please fix the quantity errors before proceeding.";
+        document.getElementById('errMsg').innerHTML = 'Please fix the quantity errors before proceeding.';
         setTimeout(() => {
-            document.getElementById('errMsg').innerHTML = "";
+            document.getElementById('errMsg').innerHTML = '';
         }, 2000);
 
         for (let i in products) {
             let qtyInput = document.querySelector(`#qty${i}_entered`);
-            // Set the input field's value to the quantity from the URL parameters
-            if (params.has(`qty${i}`)) {
+            if (!qtyInput) {
+                console.error(`Qty input not found for product ${i}`);
+                continue; // Skip to the next iteration if the input is not found
+            }
+
+            let storedInvalidQty = localStorage.getItem(`invalidQty_${i}`);
+
+            if (storedInvalidQty !== null) {
+                // Set the input field's value to the stored invalid quantity
+                qtyInput.value = storedInvalidQty;
+
+                // Validate and display the error message for the stored invalid quantity
+                validateAndDisplayMessage(qtyInput, products[i].qty_available);
+            } else if (params.has(`qty${i}`)) {
+                // Set the input field's value to the quantity from the URL parameters
                 qtyInput.value = params.get(`qty${i}`);
             }
-            let qtyError = document.getElementById(`qty${[i]}_error`);
 
-            // Validate the quantity and display errors
+            // Validate and display error messages for the current input field
+            let qtyError = document.getElementById(`qty${[i]}_error`);
+            if (!qtyError) {
+                console.error(`Qty error element not found for product ${i}`);
+                continue; // Skip to the next iteration if the error element is not found
+            }
+
             let errorMessages = validateQuantity(qtyInput.value, products[i].qty_available);
+
             if (errorMessages.length > 0) {
                 qtyError.innerHTML = errorMessages.join('<br>');
-                qtyInput.parentElement.style.borderColor = "red";
+                qtyInput.parentElement.style.borderColor = 'red';
             } else {
-                qtyError.innerHTML = "";
-                qtyInput.parentElement.style.borderColor = "black";
+                qtyError.innerHTML = '';
+                qtyInput.parentElement.style.borderColor = 'black';
             }
         }
     }
 
-// Add an event listener for WebSocket messages
-socket.addEventListener('message', function (event) {
-    // Parse the incoming JSON data
-    const updatedProducts = JSON.parse(event.data);
-
-    console.log('Received WebSocket message:', updatedProducts);
-
-    // Iterate through products to update the displayed quantities
-    for (let i in updatedProducts) {
-        // Update the displayed sold quantity
-        let qtySoldElement = document.getElementById(`qty_sold${i}`);
-        if (qtySoldElement) {
-            console.log(`Updating sold quantity for product ${i}: ${updatedProducts[i].qty_sold}`);
-            qtySoldElement.textContent = `Sold: ${updatedProducts[i].qty_sold}`;
-        }
-
-        // Update the displayed available quantity
-        let qtyAvailableElement = document.getElementById(`qty${i}_available`);
-        if (qtyAvailableElement) {
-            console.log(`Updating available quantity for product ${i}: ${updatedProducts[i].qty_available}`);
-            qtyAvailableElement.textContent = `Available: ${updatedProducts[i].qty_available}`;
-        }
-    }
-});
+};
 
 
     // Odd added code in this section before client-side validation was gpt to get the blue message for valid quantitys input
     // Populate the DOM Form with the product details
+    let productRow = document.querySelector('.row'); // Get the product row outside the loop
+
     for (let i = 0; i < products.length; i++) {
         // Create a product card for each product
         let productCard = document.createElement('div');
@@ -119,9 +114,9 @@ socket.addEventListener('message', function (event) {
         `;
 
         // Add the product card to the row
-        document.querySelector('.row').appendChild(productCard);
+        productRow.appendChild(productCard);
     }
-};
+;
 
 // Function to handle quantity changes
 function changeQuantity(index, delta) {
@@ -157,7 +152,6 @@ function validateQuantity(quantity, availableQuantity) {
 };
 
 // CHECK INPUT BOXES AGAINST DATA VALIDATION FUNCTION
-// Remove leading 0's
 function validateAndDisplayMessage(textBox, availableQuantity) {
     let str = String(textBox.value);
 
@@ -180,11 +174,17 @@ function validateAndDisplayMessage(textBox, availableQuantity) {
         errorDisplay.style.color = 'red';
         textBox.parentElement.style.borderColor = 'red';
         errorDisplay.innerHTML = errorMessages[0];
+
+        // Store the invalid quantity in local storage
+        localStorage.setItem(`invalidQty_${textBox.name}`, textBox.value);
     } else {
         // If no error messages, change the color to blue
         errorDisplay.style.color = 'blue';
         textBox.parentElement.style.borderColor = 'blue';
         errorDisplay.innerHTML = `You have selected ${inputValue}.`;
+
+        // Remove the stored invalid quantity from local storage
+        localStorage.removeItem(`invalidQty_${textBox.name}`);
     }
 }
 
@@ -208,4 +208,6 @@ function stickyNav() {
         navbar.classList.remove("sticky");
     }
 };
+
+
 
