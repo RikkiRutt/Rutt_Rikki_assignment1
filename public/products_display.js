@@ -27,11 +27,18 @@ window.onload = function () {
             let storedInvalidQty = localStorage.getItem(`invalidQty_${i}`);
 
             if (storedInvalidQty !== null) {
-                // Set the input field's value to the stored invalid quantity
-                qtyInput.value = storedInvalidQty;
+                // Convert the stored quantity to a valid non-negative integer
+                let storedQuantity = Number(storedInvalidQty);
+                if (!isNaN(storedQuantity) && storedQuantity >= 0 && Number.isInteger(storedQuantity)) {
+                    // Set the input field's value to the stored valid quantity
+                    qtyInput.value = storedQuantity;
 
-                // Validate and display the error message for the stored invalid quantity
-                validateAndDisplayMessage(qtyInput, products[i].qty_available);
+                    // Validate and display the error message for the stored valid quantity
+                    validateAndDisplayMessage(qtyInput, products[i].qty_available);
+                } else {
+                    // Remove the stored invalid quantity from local storage
+                    localStorage.removeItem(`invalidQty_${i}`);
+                }
             } else if (params.has(`qty${i}`)) {
                 // Set the input field's value to the quantity from the URL parameters
                 qtyInput.value = params.get(`qty${i}`);
@@ -102,62 +109,60 @@ window.addEventListener('websocket_open', function () {
     }
 });
 
+// Odd added code in this section before client-side validation was gpt to get the blue message for valid quantitys input
+// Populate the DOM Form with the product details
+let productRow = document.querySelector('.row'); // Get the product row outside the loop
 
-    // Odd added code in this section before client-side validation was gpt to get the blue message for valid quantitys input
-    // Populate the DOM Form with the product details
-    let productRow = document.querySelector('.row'); // Get the product row outside the loop
+for (let i = 0; i < products.length; i++) {
+    // Create a product card for each product
+    let productCard = document.createElement('div');
+    productCard.className = 'col-md-4 product_card';
+    productCard.style = 'margin-bottom: 40px; padding: 30px;';
 
-    for (let i = 0; i < products.length; i++) {
-        // Create a product card for each product
-        let productCard = document.createElement('div');
-        productCard.className = 'col-md-4 product_card';
-        productCard.style = 'margin-bottom: 40px; padding: 30px;';
+    productCard.innerHTML = `
+        <div>
+            <h5 class="product_name"><b>${products[i].model}</b></h5>
+            <h5>$${(products[i].price).toFixed(2)}</h5>
+        </div>  
+        <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
+        <div style="height: 90px;">
+            <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
+                <tr>
+                    <!-- Display available quantity for the product -->
+                    <td style="text-align: left; width: 35%;">Available: ${products[i].qty_available}</td>
 
-        productCard.innerHTML = `
-            <div>
-                <h5 class="product_name"><b>${products[i].model}</b></h5>
-                <h5>$${(products[i].price).toFixed(2)}</h5>
-            </div>  
-            <img src="${products[i].image}" style="width: 300px; height: 250px;" class="img-thumbnail" alt="${products[i].alt}">
-            <div style="height: 90px;">
-                <table style="width: 100%; text-align: center; font-size: 18px;" id="product_table">
-                    <tr>
-                        <!-- Display available quantity for the product -->
-                        <td style="text-align: left; width: 35%;">Available: ${products[i].qty_available}</td>
+                    <!-- Label for quantity -->
+                    <td style="text-align: left; width: 75%;"><label id="qty${[i]}_label" style="margin: 6px 0; padding-right: 10px;">Qty:</label></td>
+                </tr>
+                <tr>
+                    <!-- Display sold quantity for the product -->
+                    <td style="text-align: left; width: 35%;" id="qty_sold${i}">Sold: ${products[i].qty_sold}</td>
 
-                        <!-- Label for quantity -->
-                        <td style="text-align: left; width: 75%;"><label id="qty${[i]}_label" style="margin: 6px 0; padding-right: 10px;">Qty:</label></td>
-                    </tr>
-                    <tr>
-                        <!-- Display sold quantity for the product -->
-                        <td style="text-align: left; width: 35%;" id="qty_sold${i}">Sold: ${products[i].qty_sold}</td>
+                    <!-- Input field for quantity and buttons to increase/decrease -->
+                    <td style="text-align: left; width: 35%;" rowspan="2">
+                        <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
+                            <!-- Decrease quantity button with an onclick event -->
+                            <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 40px; margin-bottom: 11px;" onclick="changeQuantity(${i}, -1)">-</button>
 
-                        <!-- Input field for quantity and buttons to increase/decrease -->
-                        <td style="text-align: left; width: 35%;" rowspan="2">
-                            <div style="display: flex; justify-content: center; align-items: center; border-radius: 40px; border: 2px solid black; width: 60%; height: 40px; padding: 10px;">
-                                <!-- Decrease quantity button with an onclick event -->
-                                <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 40px; margin-bottom: 11px;" onclick="changeQuantity(${i}, -1)">-</button>
+                            <!-- Input field for quantity -->
+                            <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" oninput="validateAndDisplayMessage(this, ${products[i].qty_available})">
 
-                                <!-- Input field for quantity -->
-                                <input type="text" autocomplete="off" placeholder="0" name="qty${[i]}" id="qty${[i]}_entered" class="inputBox" style="background-color: transparent; border: none; width: 30px; text-align: center; margin: 0 10px; border: none;" oninput="validateAndDisplayMessage(this, ${products[i].qty_available})">
+                            <!-- Increase quantity button with an onclick event -->
+                            <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="changeQuantity(${i}, 1)">+</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- Error message for quantity validation -->
+                    <td colspan="3" style="padding-top: 60px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
+                </tr>
+            </table>
+        </div>  
+    `;
 
-                                <!-- Increase quantity button with an onclick event -->
-                                <button type="button" class="qtyButton highlight" style="background-color: transparent; border: none; cursor: pointer; padding: 5px 10px; font-size: 30px; margin-bottom: 7px;" onclick="changeQuantity(${i}, 1)">+</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <!-- Error message for quantity validation -->
-                        <td colspan="3" style="padding-top: 60px;"><div id="qty${[i]}_error" style="color: red;"></div></td>
-                    </tr>
-                </table>
-            </div>  
-        `;
-
-        // Add the product card to the row
-        productRow.appendChild(productCard);
-    }
-;
+    // Add the product card to the row
+    productRow.appendChild(productCard);
+}
 
 // Function to handle quantity changes
 function changeQuantity(index, delta) {
@@ -178,19 +183,14 @@ function validateQuantity(quantity, availableQuantity) {
 
     quantity = Number(quantity);
 
-    if ((isNaN(quantity)) && (quantity != '')) {
-        errors.push("Not a number. Please enter a non-negative quantity to order.");
-    } else if (quantity < 0 && !Number.isInteger(quantity)) {
-        errors.push("Negative quantity and not an Integer. Please enter a non-negative quantity to order.");
-    } else if (quantity < 0) {
-        errors.push("Negative quantity. Please enter a non-negative quantity to order.");
-    } else if (quantity != 0 && quantity != '' && !Number.isInteger(quantity)) {
-        errors.push("Not an Integer. Please enter a non-negative quantity to order.");
+    if (isNaN(quantity) || quantity < 0 || !Number.isInteger(quantity)) {
+        errors.push("Please enter a valid non-negative integer quantity to order.");
     } else if (quantity > availableQuantity) {
         errors.push(`We do not have ${quantity} available.`);
     }
+
     return errors; // Return the array of errors
-};
+}
 
 // CHECK INPUT BOXES AGAINST DATA VALIDATION FUNCTION
 function validateAndDisplayMessage(textBox, availableQuantity) {
@@ -214,7 +214,7 @@ function validateAndDisplayMessage(textBox, availableQuantity) {
         // If there are error messages, change the color to red
         errorDisplay.style.color = 'red';
         textBox.parentElement.style.borderColor = 'red';
-        errorDisplay.innerHTML = errorMessages[0];
+        errorDisplay.innerHTML = errorMessages.join('<br>');
 
         // Store the invalid quantity in local storage
         localStorage.setItem(`invalidQty_${textBox.name}`, textBox.value);
@@ -249,6 +249,7 @@ function stickyNav() {
         navbar.classList.remove("sticky");
     }
 };
+
 
 
 
